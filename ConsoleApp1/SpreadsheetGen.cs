@@ -36,15 +36,22 @@ namespace YugiohPriceSpreadsheet
                         }*/
                     }
                 }
-            // import .csv file from local dir
-            // parse it into Card
-            // for each card name, call the yugioh prices API and use the rarity and code to get the price
+
+
+                foreach(Card c in cardList)
+                {
+                    Console.WriteLine(GetCardData(c.Name));
+                }
+                // import .csv file from local dir
+                // parse it into Card
+                // for each card name, call the yugioh prices API and use the rarity and code to get the price
                 // if the rarity and code can't get the price, default to the average price
                 // set the price
                 // repeat
-            // re-export spreadsheet with price
-        }
+                // re-export spreadsheet with price
+            }
 
+        }
         public async Task<string> GetCardData(string cardName)
         {
             var baseAddress = new Uri("http://yugiohprices.com/api/");
