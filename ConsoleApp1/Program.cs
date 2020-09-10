@@ -1,22 +1,47 @@
 ﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using YugiohPriceSpreadsheet;
+using CommandLine;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ConsoleApp1
 {
     class Program
     {
+        public class Options
+        {
+            [Option('f', "filepath", Required = true, HelpText = "Set output to verbose messages.")]
+            public string Filepath { get; set; }
+        }
+
+        static void HandleParseError(IEnumerable<Error> errs)
+        {
+            var result = -2;
+            Console.WriteLine("errors {0}", errs.Count());
+            if (errs.Any(x => x is HelpRequestedError || x is VersionRequestedError))
+                result = -1;
+            Console.WriteLine("Exit code {0}", result);
+            return;
+        }
         static void Main(string[] args)
         {
-            //await GetCardData("raigeki");
-
-            Task.Run(async () =>
+            Parser.Default.ParseArguments<Options>(args).WithParsed<Options>(o =>
             {
-                // Do any async anything you need here without worry
-                Console.WriteLine(await GetCardData("raigeki"));
-            }).GetAwaiter().GetResult();
+                //await GetCardData("raigeki");
+                SpreadsheetGen gen = new SpreadsheetGen();
+                gen.Run(o.Filepath);
+                /*
+                Task.Run(async () =>
+                {
+                   
+                }).GetAwaiter().GetResult();*/
 
-            Console.ReadLine();
+                Console.ReadLine();
+            }).WithNotParsed(HandleParseError);
+
+            
         }
 
         static async Task<string> GetCardData(string cardName)

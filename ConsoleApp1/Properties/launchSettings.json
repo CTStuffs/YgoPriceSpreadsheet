@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "YugiohPriceSpreadsheet": {
+      "commandName": "Project",
+      "commandLineArgs": "-f \"C:\\Users\\ChristopherTang\\Documents\\Coding\\YgoPriceSpreadsheet\\example.csv\""
+    }
+  }
+}
