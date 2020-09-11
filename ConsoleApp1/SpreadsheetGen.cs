@@ -5,6 +5,8 @@ using System.IO;
 using Microsoft.VisualBasic.FileIO;
 using System.Collections.Generic;
 using System.Linq;
+using CsvHelper;
+using System.Globalization;
 
 namespace YugiohPriceSpreadsheet
 {
@@ -21,24 +23,49 @@ namespace YugiohPriceSpreadsheet
             }
             else
             {
-                using (TextFieldParser parser = new TextFieldParser(@filepath))
+                using (var reader = new StreamReader(filepath))
                 {
-                    parser.TextFieldType = FieldType.Delimited;
-                    parser.SetDelimiters(",");
-                    while (!parser.EndOfData)
+                    using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
                     {
-                        string[] fields = parser.ReadFields();
-                        cardList.Append(new Card(fields[0], Int32.Parse(fields[1]), fields[2], fields[3], 0));
-                        /*
-                        foreach (string field in fields)
+                        csv.Read();
+                        csv.ReadHeader();
+                        while (csv.Read())
                         {
-                           
-                        }*/
+                            
+                            var card = new Card
+                            {
+                                Name = csv.GetField("Name"),
+                                Quantity = csv.GetField<int>("Quantity"),
+                                Rarity = csv.GetField("Rarity"),
+                                PackCode = csv.GetField("PackCode"),
+                                Price = 0.0
+                            };
+                            cardList.Add(card);
+                            //Console.WriteLine(csv.ToString());
+                        }
+
                     }
                 }
+                    /*
+                    using (TextFieldParser parser = new TextFieldParser(filepath))
+                    {
+                        parser.TextFieldType = FieldType.Delimited;
+                        parser.SetDelimiters(",");
+                        while (!parser.EndOfData)
+                        {
+                            string[] fields = parser.ReadFields();
+                            cardList.Append(new Card(fields[0], Int32.Parse(fields[1]), fields[2], fields[3], 0));
+
+                            foreach (string field in fields)
+                            {
+
+                            }
+                        }
+                    }
+                    */
 
 
-                foreach(Card c in cardList)
+                foreach (Card c in cardList)
                 {
                     Console.WriteLine(GetCardData(c.Name));
                 }

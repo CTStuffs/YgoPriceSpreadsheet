@@ -2,7 +2,7 @@
   "profiles": {
     "YugiohPriceSpreadsheet": {
       "commandName": "Project",
-      "commandLineArgs": "-f \"C:\\Users\\ChristopherTang\\Documents\\Coding\\YgoPriceSpreadsheet\\example.csv\""
+      "commandLineArgs": "-f \"C:\\Users\\CT\\Documents\\Coding\\C# Training\\YgoPriceSpreadsheet\\example.csv\""
     }
   }
 }
