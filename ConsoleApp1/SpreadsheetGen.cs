@@ -7,23 +7,24 @@ using System.Collections.Generic;
 using System.Linq;
 using CsvHelper;
 using System.Globalization;
+using Newtonsoft.Json.Linq;
 
 namespace YugiohPriceSpreadsheet
 {
     class SpreadsheetGen
     {
 
-        public void Run(string filepath)
+        public async Task RunAsync(string filein, string fileout)
         {
             List<Card> cardList = new List<Card>();
-            if (!File.Exists(filepath))
+            if (!File.Exists(filein))
             {
-                Console.WriteLine("File " + filepath + " does not exist!");
+                Console.WriteLine("File " + filein + " does not exist!");
                 return;
             }
             else
             {
-                using (var reader = new StreamReader(filepath))
+                using (var reader = new StreamReader(filein))
                 {
                     using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
                     {
@@ -40,10 +41,23 @@ namespace YugiohPriceSpreadsheet
                                 PackCode = csv.GetField("PackCode"),
                                 Price = 0.0
                             };
+                            card.Price = await GetPrice(card.Name, card.PackCode);
                             cardList.Add(card);
                             //Console.WriteLine(csv.ToString());
                         }
 
+                    }
+
+
+
+                }
+
+
+                using (var writer = new StreamWriter(fileout))
+                {
+                    using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+                    {
+                        csv.WriteRecords(cardList);
                     }
                 }
                     /*
@@ -64,11 +78,11 @@ namespace YugiohPriceSpreadsheet
                     }
                     */
 
-
-                foreach (Card c in cardList)
+                /*
+                    foreach (Card c in cardList)
                 {
-                    Console.WriteLine(GetCardData(c.Name));
-                }
+                    //await GetCardData(c.Name);
+                }*/
                 // import .csv file from local dir
                 // parse it into Card
                 // for each card name, call the yugioh prices API and use the rarity and code to get the price
@@ -78,21 +92,45 @@ namespace YugiohPriceSpreadsheet
                 // re-export spreadsheet with price
             }
 
+            return;
+
         }
-        public async Task<string> GetCardData(string cardName)
+        //public async Task<string> GetCardData(string cardName)
+        public async Task<double> GetPrice(string cardName, string packcode)
         {
             var baseAddress = new Uri("http://yugiohprices.com/api/");
             string responseData = "";
+            double price = 0.0;
             using (var httpClient = new HttpClient { BaseAddress = baseAddress })
             {
+                HttpResponseMessage response = await httpClient.GetAsync("get_card_prices/" + cardName);
 
+                if (response.IsSuccessStatusCode)
+                {
+                    responseData = await response.Content.ReadAsStringAsync();
+                    dynamic jsonData = JObject.Parse(responseData);
+
+                    //var index = jsonData.data.Select();
+                    JArray temp = jsonData.data;
+                    dynamic token = JObject.Parse(jsonData.SelectToken("$..data[?(@.print_tag == '" + packcode + "')]").ToString());
+                    //dynamic token = JObject.Parse((string) jsonData.SelectToken("$..data[?(@.print_tag == '" + packcode + "')]"));
+
+                    // int index = temp.FindIndex(x => x.print_tag == packCode);
+                    //dynamic raw = JObject.Parse(token.ToString());
+                    //price = Double.Parse(raw.price_data.data.prices.average);
+                    dynamic raw = token.price_data.data.prices.average;
+                    price = raw.Value;
+                }
+
+                /*
                 using (var response = await httpClient.GetAsync("get_card_prices/" + cardName))
                 {
 
                     responseData = await response.Content.ReadAsStringAsync();
-                }
+                }*/
             }
-            return responseData;
+
+            return price;
         }
     }
 }

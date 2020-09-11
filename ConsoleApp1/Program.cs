@@ -12,8 +12,12 @@ namespace ConsoleApp1
     {
         public class Options
         {
-            [Option('f', "filepath", Required = true, HelpText = "Set output to verbose messages.")]
-            public string Filepath { get; set; }
+            [Option('f', "filein", Required = true, HelpText = "Set output to verbose messages.")]
+
+            public string FileIn { get; set; }
+
+            [Option('i', "fileout", Required = true, HelpText = "Set output to verbose messages.")]
+            public string FileOut { get; set; }
         }
 
         static void HandleParseError(IEnumerable<Error> errs)
@@ -27,11 +31,11 @@ namespace ConsoleApp1
         }
         static void Main(string[] args)
         {
-            Parser.Default.ParseArguments<Options>(args).WithParsed<Options>(o =>
+            Parser.Default.ParseArguments<Options>(args).WithParsed<Options>(async o =>
             {
                 //await GetCardData("raigeki");
                 SpreadsheetGen gen = new SpreadsheetGen();
-                gen.Run(o.Filepath);
+                gen.RunAsync(o.FileIn, o.FileOut).Wait();
                 /*
                 Task.Run(async () =>
                 {
