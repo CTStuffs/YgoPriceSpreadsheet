@@ -12,11 +12,11 @@ namespace ConsoleApp1
     {
         public class Options
         {
-            [Option('f', "filein", Required = true, HelpText = "Set output to verbose messages.")]
+            [Option('i', "filein", Required = true, HelpText = "Set output to verbose messages.")]
 
             public string FileIn { get; set; }
 
-            [Option('i', "fileout", Required = true, HelpText = "Set output to verbose messages.")]
+            [Option('o', "fileout", Required = true, HelpText = "Set output to verbose messages.")]
             public string FileOut { get; set; }
         }
 
@@ -42,12 +42,12 @@ namespace ConsoleApp1
                    
                 }).GetAwaiter().GetResult();*/
 
-                Console.ReadLine();
+                //Console.ReadLine();
             }).WithNotParsed(HandleParseError);
 
-            
-        }
 
+        }
+        /*
         static async Task<string> GetCardData(string cardName)
         {
             var baseAddress = new Uri("http://yugiohprices.com/api/");
@@ -62,6 +62,6 @@ namespace ConsoleApp1
                 }
             }
             return responseData;
-        }
+        }*/
     }
 }

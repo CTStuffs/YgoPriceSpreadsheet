@@ -10,7 +10,10 @@ namespace YugiohPriceSpreadsheet
         public int Quantity { get; set; }
         public string Rarity { get; set; }
         public string PackCode { get; set; }
-        public double Price { get; set; }
+        public string Edition { get; set; }
+        public double PriceIndividual { get; set; }
+
+        public double PriceTotal { get; set; }
 
         /*
         public Card(string name, int quantity, string rarity, string packcode, double price){
